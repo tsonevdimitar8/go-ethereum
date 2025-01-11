@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   geth:
     image: 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:latest
