@@ -72,8 +72,7 @@ jobs:
 
     - name: Install Node.js and npm in the container
       run: |
-        docker exec geth-node sh -c "curl -fsSL https://deb.nodesource.com/setup_22.x | sh - \
-        && apt-get update && apt-get install -y nodejs"
+        docker exec geth-node sh -c "apk add nodejs npm"
 
     - name: Install dependencies for Hardhat and run tests
       run: |
