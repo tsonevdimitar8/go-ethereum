@@ -6,6 +6,7 @@ on:
       - closed
 
 jobs:
+  # Job executed when PR with label CI:Build is merged
   build-and-push:
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'CI:Build')
     runs-on: ubuntu-latest
@@ -35,3 +36,65 @@ jobs:
 
     - name: Success
       run: echo "Docker image built and pushed successfully."
+
+  # Job executed when PR with label CI:Deploy is merged
+  deploy-and-test-hardhat:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'CI:Deploy')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install Docker-compose
+      run: |
+        curl -L "https://github.com/docker/compose/releases/download/2.32.2/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose \
+        && chmod +x /usr/local/bin/docker-compose \
+        && docker-compose --version
+
+    - name: Login to ECR
+      uses: docker/login-action@v3
+      with:
+        registry: 160885291539.dkr.ecr.eu-north-1.amazonaws.com
+        username: ${{ vars.AWS_ACCESS_KEY_ID }}
+        password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    
+    - name: Run Docker Compose to start the local devnet
+      run: |
+        docker-compose up -d
+        sleep 15  # Wait for the container to initialize
+    
+    - name: Copy the hardhat directory into the container
+      run: |
+        docker cp ./hardhat geth-node:/hardhat
+
+    - name: Install dependencies for Hardhat and run tests
+      run: |
+        # Install Hardhat dependencies in the container
+        docker exec geth-node bash -c "cd /hardhat && npm install"
+        docker exec geth-node bash -c "cd /hardhat && npx hardhat compile"
+
+    - name: Deploy contracts to local devnet
+      run: |
+        docker exec geth-node bash -c "cd /hardhat && yes | npx hardhat ignition deploy ./ignition/modules/Lock.js --network local --verbose"
+
+    - name: Login to ECR
+      uses: docker/login-action@v3
+      with:
+        registry: 160885291539.dkr.ecr.eu-north-1.amazonaws.com
+        username: ${{ vars.AWS_ACCESS_KEY_ID }}
+        password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Commit pre-deployed image
+      run: |
+        docker commit geth-node 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha::7 }}
+
+    - name: Push pre-deployed image to ECR
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        tags: 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha::7 }}
+
+
