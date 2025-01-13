@@ -89,12 +89,12 @@ jobs:
 
     - name: Commit pre-deployed image
       run: |
-        docker commit geth-node 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha::7 }}
+        docker commit geth-node 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha }}
 
     - name: Push pre-deployed image to ECR
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha::7 }}
+        tags: 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha }}
 
 
