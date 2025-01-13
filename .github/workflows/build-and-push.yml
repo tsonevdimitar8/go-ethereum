@@ -99,5 +99,17 @@ jobs:
       with:
         push: true
         tags: 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha }}
+    
+    - name: Run Hardhat tests against predeployed contracts
+      run: |
+        docker run -d --name predeployed 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha }}
+
+        # Wait for the container to initialize
+        sleep 15
+
+        docker exec predeployed sh -c "cd /hardhat && npx hardhat test"
+
+        docker stop predeployed
+        docker rm predeployed
 
 
