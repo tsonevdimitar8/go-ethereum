@@ -70,11 +70,15 @@ jobs:
       run: |
         docker cp ./hardhat geth-node:/hardhat
 
+    - name: Install Node.js and npm in the container
+      run: |
+        docker exec geth-node sh -c "curl -fsSL https://deb.nodesource.com/setup_22.x | sh - \
+        && apt-get update && apt-get install -y nodejs"
+
     - name: Install dependencies for Hardhat and run tests
       run: |
         # Install Hardhat dependencies in the container
-        docker exec geth-node sh -c "cd /hardhat && npm install"
-        docker exec geth-node sh -c "cd /hardhat && npx hardhat compile"
+        docker exec geth-node sh -c "cd /hardhat && npm install && npx hardhat compile"
 
     - name: Deploy contracts to local devnet
       run: |
