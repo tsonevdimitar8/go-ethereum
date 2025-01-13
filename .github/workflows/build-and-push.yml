@@ -63,29 +63,29 @@ jobs:
     
     - name: Run Docker Compose to start the local devnet
       run: |
-        docker-compose up -d geth-node-dev
+        docker-compose up -d
         sleep 15  # Wait for the container to initialize
     
     - name: Copy the hardhat directory into the container
       run: |
-        docker cp ./hardhat geth-node-dev:/hardhat
+        docker cp ./hardhat geth-node:/hardhat
 
     - name: Install Node.js and npm in the container
       run: |
-        docker exec geth-node-dev sh -c "apk add nodejs npm"
+        docker exec geth-node sh -c "apk add nodejs npm"
 
     - name: Install dependencies for Hardhat and run tests
       run: |
         # Install Hardhat dependencies in the container
-        docker exec geth-node-dev sh -c "cd /hardhat && npm install && npx hardhat compile"
+        docker exec geth-node sh -c "cd /hardhat && npm install && npx hardhat compile"
 
     - name: Deploy contracts to local devnet
       run: |
-        docker exec geth-node-dev sh -c "cd /hardhat && yes | npx hardhat ignition deploy ./ignition/modules/Lock.js --network local --verbose"
+        docker exec geth-node sh -c "cd /hardhat && yes | npx hardhat ignition deploy ./ignition/modules/Lock.js --network local --verbose"
 
     - name: Commit pre-deployed image
       run: |
-        docker commit geth-node-dev 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha }}
+        docker commit geth-node 160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-${{ github.sha }}
 
     - name: Push pre-deployed image to ECR
       uses: docker/build-push-action@v6
