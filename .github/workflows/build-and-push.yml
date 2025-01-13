@@ -50,7 +50,7 @@ jobs:
 
     - name: Install Docker-compose
       run: |
-        curl -L "https://github.com/docker/compose/releases/download/2.32.2/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose \
+        curl -L "https://github.com/docker/compose/releases/download/v2.32.2/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose \
         && chmod +x /usr/local/bin/docker-compose \
         && docker-compose --version
 
