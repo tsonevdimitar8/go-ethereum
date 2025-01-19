@@ -5,7 +5,7 @@
 - **Terraform**: for deploying infrastructure in the cloud.
 - **AWS CLI**: for interacting with AWS services like ECR and Kubernetes.
 
-# Local testing
+# Local testing 
 Run the following command to start the container running the Go-Ethereum devnet using the latest image from ECR:
 
 ```bash
