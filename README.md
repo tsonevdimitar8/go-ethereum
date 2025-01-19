@@ -1,4 +1,5 @@
 ## Usage
+
 # Prerequisites
 - **Docker** and **Docker Compose**: for building and running containers locally.
 - **Terraform**: for deploying infrastructure in the cloud.
