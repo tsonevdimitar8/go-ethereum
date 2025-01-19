@@ -76,6 +76,7 @@ module "eks" {
     }
 
   }
+  depends_on = [module.vpc]
 }
 
 data "aws_iam_policy" "ebs_csi_policy" {
@@ -93,3 +94,24 @@ module "irsa-ebs-csi" {
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
 }
 
+data "aws_eks_cluster" "cluster" {
+  name       = module.eks.cluster_name
+  depends_on = [module.eks]
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name       = module.eks.cluster_name
+  depends_on = [module.eks]
+}
+
+resource "null_resource" "apply_k8s_resources" {
+  depends_on = [module.eks]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.region}
+      kubectl apply -f ${path.module}/../kubernetes-resources/namespace.yaml
+      kubectl apply -f ${path.module}/../kubernetes-resources/deployment.yaml
+    EOT
+  }
+}
