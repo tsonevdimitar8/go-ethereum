@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-ethereum-predeployed
+  namespace: devnet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-ethereum-predeployed
+  template:
+    metadata:
+      labels:
+        app: go-ethereum-predeployed
+    spec:
+      containers:
+      - name: go-ethereum-predeployed
+        image: "160885291539.dkr.ecr.eu-north-1.amazonaws.com/go-ethereum:predeployed-88abb850611b11bdc8b0b984ebaf3140565347f1"
+        ports:
+        - containerPort: 8545
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "150m"
+          limits:
+            memory: "512Mi"
+            cpu: "400m"

@@ -1,5 +1,41 @@
-##
-Build test12
+## Usage
+# Prerequisites
+- **Docker** and **Docker Compose**: for building and running containers locally.
+- **Terraform**: for deploying infrastructure in the cloud.
+- **AWS CLI**: for interacting with AWS services like ECR and Kubernetes.
+
+# Local testing
+Run the following command to start the container running the Go-Ethereum devnet using the latest image from ECR:
+
+```bash
+docker-compose up -d
+```
+
+## CI/CD Pipelines
+The repository contains two GitHub Actions workflows:
+
+# CI:Build
+Automatically triggered by pull requests with the label CI:Build. It:
+Builds and pushes the go-ethereum Docker image.
+
+# CI:Deploy
+Automatically triggered by pull requests with the label CI:Deploy. It:
+
+Deploys the Hardhat contracts to a devnet.
+Builds and pushes a new Docker image with predeployed contracts.
+Runs the Hardhat tests against the image.
+
+## Terraform Deployment
+1. Configure your cloud provider credentials.
+2. Navigate to the Terraform directory:
+cd terraform
+3. Initialize and apply the configuration:
+terraform init
+terraform apply
+
+This will:
+- Create a Kubernetes cluster.
+- Deploy the Docker image with predeployed contracts.
 
 ## Go Ethereum
 
